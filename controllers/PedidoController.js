@@ -120,7 +120,20 @@ const updatePedido = async(req, res) => {
 
 //search pedido
 const searchPedido = async(req, res) => {
-    const {q} = req.query
+    var {q} = req.query
+
+    if(!q.includes('-')){
+        q += "+"
+    }
+    console.log(q)
+
+    if(q.includes("+") || q.includes("-")){
+
+        //pega so quando a query se encontra na primeira posição do array
+        const pedidos = await Pedido.find({tipos: {$elemMatch: {$eq: q}}}).exec()
+        return res.status(200).json(pedidos)
+
+    }
     const pedidos = await Pedido.find({local: new RegExp(q, "i")}).exec()
     return res.status(200).json(pedidos)
 }
