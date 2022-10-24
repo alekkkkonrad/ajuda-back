@@ -13,7 +13,7 @@ router.post("/", authGuard, pedidoInsertValidation(), validate, insertPedido)
 router.delete("/:id", authGuard, deletePedido)
 router.get("/", getAllPedidos)
 router.get("/users/:id", authGuard, getUserPedidos)
-router.get("/search", authGuard, searchPedido)
+router.get("/search", searchPedido)
 router.get("/:id", authGuard, getPedidoById)
 router.put("/:id", authGuard, pedidoUpdateValidation(), updatePedido)
 module.exports = router

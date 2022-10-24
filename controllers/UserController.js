@@ -2,6 +2,8 @@ const User = require("../models/User")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const mongoose = require("mongoose")
+const crypto = require('crypto')
+const mailer = require('../modules/mailer')
 
 const jwtSecret = process.env.JWT_SECRET
 
@@ -87,7 +89,6 @@ const getCurrentUser = async(req, res) => {
 
 //update a an user
 const update = async(req, res) => {
-    console.log(req)
     const {nome, sobrenome, tipoSangue, celular, local, senha} = req.body
     let profileImage = null
 
@@ -128,11 +129,85 @@ const update = async(req, res) => {
     res.status(200).json(user)
 }
 
-//get user by id? maybe
+//forget password
+const forgotPassword = async(req, res) => {
+
+    console.log(req.body)
+
+    const {email} = req.body
+    console.log(email)
+    try{
+        const user = await User.findOne({email})
+        if(!user){
+            res.status(404).json({errors: ["Usuário não encontrado"]})
+            return
+        }
+
+        const token = crypto.randomBytes(20).toString('hex')
+        const now = new Date()
+        now.setHours(now.getHours() + 1)
+
+        await User.findByIdAndUpdate(mongoose.Types.ObjectId(user._id), {
+            '$set': {
+                passwordResetToken: token,
+                passwordResetExpires: now,
+            }
+        })
+
+        mailer.sendMail({
+            to: email,
+            from: 'srv4rg4s@gmail.com',
+            template: '/auth/forgotPassword',
+            context: {token}
+        }, (err) => {
+            if(err) return res.status(404).json({errors: ["Erro ao enviar email..."]}) 
+
+            return res.send()
+        })
+
+    } catch(error){
+        console.log(error)
+    }
+}
+
+const resetPassword = async(req, res) => {
+    const {email, token, senha} = req.body
+
+    try{
+        const user = await User.findOne({email})
+        if(!user){
+            res.status(404).json({errors: ["Usuário não encontrado"]})
+            return
+        }
+
+        if(token !== user.passwordResetToken){
+            res.status(400).json({errors: ["Token inválido"]})
+            return
+        }
+
+        const now = new Date()
+        if(now > user.passwordResetExpires){
+            res.status(400).json({errors: ["Token expirou, gere um novo"]})
+            return
+        }
+
+        const salt = await bcrypt.genSalt()
+        const passwordHash = await bcrypt.hash(senha, salt)
+
+        user.senha = passwordHash
+
+        await user.save()
+        res.send()
+    } catch(err){   
+        console.log(err)
+    }
+}
 
 module.exports = {
     register,
     login,
     getCurrentUser,
-    update
+    update,
+    forgotPassword,
+    resetPassword
 }

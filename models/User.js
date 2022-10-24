@@ -12,6 +12,8 @@ const userSchema = new Schema(
         local: String,
         senha: String,
         profileImage: String,
+        passwordResetToken: String,
+        passwordResetExpires: Date,
     },
     {
         timestamps: true
