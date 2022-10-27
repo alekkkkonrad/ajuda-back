@@ -7,6 +7,7 @@ const {
     login,
     getCurrentUser, 
     update,
+    getUserById,
     forgotPassword, 
     resetPassword
 } = require("../controllers/UserController")
@@ -20,6 +21,7 @@ const { imageUpload } = require("../middlewares/imageUpload")
 //routes
 router.post("/request", forgotPassword)
 router.post("/reseta", resetPassword)
+router.get("/details", getUserById)
 router.post("/register", userCreateValidation(), validate, register)
 router.post("/login", loginValidation(), validate, login)
 router.get("/profile", authGuard, getCurrentUser)

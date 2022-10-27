@@ -122,9 +122,12 @@ const updatePedido = async(req, res) => {
 const searchPedido = async(req, res) => {
     var {q} = req.query
 
-    if(!q.includes('-')){
-        q += "+"
+    if(q.length <= 3){
+        if(!q.includes('-')){
+            q += "+"
+        }
     }
+
     console.log(q)
 
     if(q.includes("+") || q.includes("-")){

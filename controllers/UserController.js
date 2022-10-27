@@ -129,6 +129,20 @@ const update = async(req, res) => {
     res.status(200).json(user)
 }
 
+//et user by id
+const getUserById = async(req, res) => {
+
+    console.log(req.body)
+    /*const {id} = req.body
+
+    const user = await User.findById(mongoose.Types.ObjectId(id))
+
+    if(!user){
+        return res.status(404).json({errors: ["Usuário não encontrado"]})
+    }
+    return res.status(200).json(user)*/
+}
+
 //forget password
 const forgotPassword = async(req, res) => {
 
@@ -208,6 +222,7 @@ module.exports = {
     login,
     getCurrentUser,
     update,
+    getUserById,
     forgotPassword,
     resetPassword
 }
