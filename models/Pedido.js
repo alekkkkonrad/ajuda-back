@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const {Schema} = mongoose
 
 const pedidoSchema = new Schema({
+	email: String,
 	titulo: String,
 	username: String,
 	image: String,

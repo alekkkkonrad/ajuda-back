@@ -146,10 +146,8 @@ const getUserById = async(req, res) => {
 //forget password
 const forgotPassword = async(req, res) => {
 
-    console.log(req.body)
-
     const {email} = req.body
-    console.log(email)
+    
     try{
         const user = await User.findOne({email})
         if(!user){
@@ -170,7 +168,7 @@ const forgotPassword = async(req, res) => {
 
         mailer.sendMail({
             to: email,
-            from: 'srv4rg4s@gmail.com',
+            from: 'ajudamais.net@gmail.com',
             template: '/auth/forgotPassword',
             context: {token}
         }, (err) => {

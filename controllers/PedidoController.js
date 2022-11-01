@@ -1,6 +1,7 @@
 const Pedido = require("../models/Pedido")
 const User = require("../models/User")
 const mongoose = require("mongoose")
+const mailer = require('../modules/mailer')
 
 // Insert a pedid, with an user related to it
 const insertPedido = async(req, res) => {
@@ -12,6 +13,7 @@ const insertPedido = async(req, res) => {
 
     //create pedido
     const newPedido = await Pedido.create({
+        email: user.email,
         titulo,
         username: user.nome,
         image: user.profileImage,
@@ -61,7 +63,11 @@ const deletePedido = async(req, res) => {
 
 // get all pedidos
 const getAllPedidos = async(req, res) => {
-    const pedidos = await Pedido.find({}).sort([["createAt", -1]]).exec()
+
+    const limit = 100
+    var {q} = req.query
+
+    const pedidos = await Pedido.find({}).sort([["createAt", -1]]).limit(100).skip(q).exec()
 
     return res.status(200).json(pedidos)
 }
@@ -128,8 +134,6 @@ const searchPedido = async(req, res) => {
         }
     }
 
-    console.log(q)
-
     if(q.includes("+") || q.includes("-")){
 
         //pega so quando a query se encontra na primeira posição do array
@@ -140,6 +144,39 @@ const searchPedido = async(req, res) => {
     const pedidos = await Pedido.find({local: new RegExp(q, "i")}).exec()
     return res.status(200).json(pedidos)
 }
+
+//make contact
+const makeContact = async(req, res) => {
+    
+    const {destino, origem} = req.body
+
+    const userOrigem = await User.findOne({origem})
+    const userDestino = await User.findOne({origem})
+    
+    const {email, nome, sobrenome, celular} = userOrigem
+    const nomeCompleto = nome +" "+ sobrenome
+
+    if(!userDestino){
+        res.status(404).json({errors: ["Usuário não encontrado"]})
+        return
+    }
+
+    try{
+        mailer.sendMail({
+            to: destino,
+            from: 'ajudamais.net@gmail.com',
+            template: '/auth/contact',
+            context: {nomeCompleto, email, celular}
+        }, (err) => {
+            if(err) return res.status(404).json({errors: ["Erro ao enviar email..."]}) 
+            return res.send()
+        })
+    } catch(error){
+        console.log(error)
+    }
+
+    return res.send()
+}
 module.exports = {
     insertPedido,
     deletePedido,
@@ -148,4 +185,5 @@ module.exports = {
     getPedidoById,
     updatePedido,
     searchPedido,
+    makeContact
 }
