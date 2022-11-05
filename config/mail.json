@@ -1,6 +1,6 @@
 {
-    "host": "smtp.mailtrap.io",
-    "post": 2525,
-    "user": "5df4cee1ba4e47",
-    "pass": "6a970ab5808ee3"
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "user": "ajudamais.net@gmail.com",
+    "pass": "jztljghvowyrpgte"
 }

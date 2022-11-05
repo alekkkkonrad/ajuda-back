@@ -151,7 +151,7 @@ const makeContact = async(req, res) => {
     const {destino, origem} = req.body
 
     const userOrigem = await User.findOne({origem})
-    const userDestino = await User.findOne({origem})
+    const userDestino = await User.findOne({destino})
     
     const {email, nome, sobrenome, celular} = userOrigem
     const nomeCompleto = nome +" "+ sobrenome
